@@ -13,18 +13,11 @@
   --stone-4: #f1c40f;
 }
 
-#background{
-  position: fixed; 
-  top: 0;
-  left: 0;
-  min-width: 100%; 
-  min-height: 100%;
-  z-index: -1; 
-}
-
 body{
+  background-image: url(img/body_img.jpeg);
   background-size: cover;
   background-repeat: no-repeat;  
+  background-attachment: fixed;
 }
 
 h1{
