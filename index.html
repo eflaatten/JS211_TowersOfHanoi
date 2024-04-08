@@ -2,22 +2,43 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tac+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
     <title></title>
     <script src="index.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <video id="background" src="./img/4K Space Starfield Background - Free Space Footage.mp4" autoplay loop></video>
+    <audio id="stonePlacedSound" src="./sounds/stone_drop.wav"></audio>
+    <audio id="illegalMoveSound" src="./sounds/illegal_move_sound.wav"></audio>
+    <audio id="winSound" src="./sounds/game_won_sound.wav"></audio>
   </head>
   <body>
     <h1>Towers Of Hanoi</h1>
-    <hr/>
-      <div id="top-row" data-row="top" class="red row" onclick="selectRow(this)"></div>
-      <div id="middle-row" data-row="middle" class="yellow row" onclick="selectRow(this)"></div>
-      <div id="bottom-row" class="green row" data-row="bottom" onclick="selectRow(this)">
-        <div id="4" data-size="4" data-color="yellow" class="stone" ></div>
-        <div id="3" data-size="3" data-color="red" class="stone" ></div>
-        <div id="2" data-size="2" data-color="green" class="stone" ></div>
-        <div id="1" data-size="1" data-color="blue" class="stone" ></div>
+    <div class="towers-container">
+      <div class="controls">
+        <button id="resetButton" onclick="reset()">Reset</button>
       </div>
-    <hr/>
+      <div class="game-text">      
+        <div id="move-count"></div>
+        <div id="messageContainer"></div>
+      </div>
+      <div class="towers-wrapper">
+        <div class="tower" data-col="left" id="tower-a" onclick="selectCol(this)">
+          <div class="stone" data-size="4" data-color="yellow" id="4"></div>
+          <div class="stone" data-size="3" data-color="red" id="3"></div>
+          <div class="stone" data-size="2" data-color="green" id="2"></div>
+          <div class="stone" data-size="1" data-color="blue" id="1"></div>
+        </div>
+        <div class="tower" data-col="middle" id="tower-b" onclick="selectCol(this)"></div>
+        <div class="tower" data-col="right" id="tower-c" onclick="selectCol(this)"></div>
+      </div>
+      </div>
   </body>
 </html>
 

@@ -1,42 +1,170 @@
-// * This js file is incomplete. It will log to the console the elements you click
-    // call another function and set stone. You will have to work through the logic
-    // of the game as you know it from building it in the terminal. Work through the
-    // puzzle slowly, stepping through the flow of logic, and making the game work.
-    // Have fun!!
-// * First run the program in your browser with live server and double-click on the row you'd like to select an element from.
-// * Why are you get a warning in your console? Fix it.
-// * Delete these comment lines!
+let stone = null
 
-const stone = null
+let selectedStone = null
+let selectedColID = null
 
-// this function is called when a row is clicked. 
-// Open your inspector tool to see what is being captured and can be used.
-const selectRow = (row) => {
-  const currentRow = row.getAttribute("data-row")
-  
-  console.log("Yay, we clicked an item", row)
-  console.log("Here is the stone's id: ", row.id)
-  console.log("Here is the stone's data-size: ", currentRow)
+// Moves start at 0
+let moves = 0
 
-  pickUpStone(row.id)
+// Selecting one of the towers and stone
+const selectCol = (col) => {
+  const currentCol = col.getAttribute("data-col")
+  const colID = col.id
+
+  if(selectedStone){
+    const currentSize = parseInt(selectedStone.getAttribute('data-size'))
+    moveStone(currentSize, currentCol)
+    selectedStone = null
+  } else {
+    selectedStone = col.lastElementChild
+  }
+
+  console.log("Yay, we clicked an item", col)
+  console.log("Here is the stone's id: ", colID)
+  console.log("Here is the stone's data-size: ", currentCol)
 } 
 
-// this function can be called to get the last stone in the stack
-// but there might be something wrong with it...
-const pickUpStone = (rowID) => {
-  const selectedRow = document.getElementById(rowID);
-  stone = selectedRow.removeChild(selectedRow.lastChild);
+// Selecting the stone
+const pickUpStone = (colID) => {
+  const selectedCol = document.getElementById(colID)
+
+  if(selectedCol.children.length > 0){
+    selectedColID = colID
+  }
   console.log(stone)
 }
 
-// You could use this function to drop the stone but you'll need to toggle between pickUpStone & dropStone
-// Once you figure that out you'll need to figure out if its a legal move...
-// Something like: if(!stone){pickupStone} else{dropStone}
+// Moving the stone to the target column
+const moveStone = (size, target) => {
 
-const dropStone = (rowID, stone) => {
-  document.getElementById(rowID).appendChild(stone)
-  stone = null
+  // Check if move is legal
+  if(isLegal(size, target)){
+    const targetColEl = document.querySelector(`[data-col=${target}]`)
+
+    // Place the stone in the target column
+    targetColEl.appendChild(selectedStone)
+
+    // Play sound when stone is placed
+    playStonePlacedSound()
+
+    // Moves go up by 1
+    moves++
+
+    // Calling the function to update the move count
+    updateMoveCount()
+  } else {
+    playIllegalMoveSound()
+    showErrorMessage('Illegal move!')
+    console.log('Illegal move')
+  }
+
+  // Checking for win after every move
+  if(checkForWin()){
+    gameWonSound()
+    showSuccessMessage('Well done!')
+    console.log('You win!')
+  }
 }
 
-// * Remember you can use your logic from 'main.js' to maintain the rules of the game. But how? Follow the flow of data just like falling dominoes.
+// Dropping the stone into the target column
+const dropStone = (colID) => {
+  const targetCol  = document.getElementById(colID)
+
+  if(selectedStone && selectedColID !== colID){
+    targetCol.appendChild(selectedStone)
+    console.log('dropped stone into', colID)
+  }
+}
+
+// Function to check if the move is legal
+const isLegal = (size, target) => {
+  const destinationColEl = document.querySelector(`.tower[data-col="${target}"]`)
+  const topStone = destinationColEl.lastElementChild
+
+  if(!topStone){
+    return true
+  }
+  // else, if the top stone is smaller than the stone being moved
+  return parseInt(size) < parseInt(topStone.getAttribute("data-size"))
+}
+
+const checkForWin = () => {
+  const winningStack = document.querySelector('.tower[data-col="right"]')
+  return winningStack.children.length === 4
+}
+
+// Resetting the game
+const reset = () => {
+  const leftStack = document.querySelector('.tower[data-col="left"]')
+  const stones = document.querySelectorAll('.stone')
+  const messageContainer = document.getElementById('messageContainer')
+
+  // Removing the win message
+  while(messageContainer.firstChild){
+    messageContainer.removeChild(messageContainer.firstChild)
+  }
+  // setting the move count to 0 and updating it
+  moves = 0
+  updateMoveCount()
+
+  // Resetting the stones to the left tower in the correct order
+  const stoneArr = []
+  // Sorting the stones by size
+  stones.forEach(stone => {
+    const size = parseInt(stone.getAttribute('data-size'))
+    stoneArr.push({element: stone, size: size})
+  })
+
+  stoneArr.sort((a, b) => b.size - a.size)
+
+  return stoneArr.forEach(stone => leftStack.appendChild(stone.element))
+}
+
+// Functions for HTML elements
+
+// Function to show the illegal move message
+const showErrorMessage = (message) => {
+  const messageContainer = document.getElementById('messageContainer')
+  const errorMessage = document.createElement('div')
+
+  errorMessage.textContent = message
+  errorMessage.classList.add('error')
+  messageContainer.appendChild(errorMessage)
+  setTimeout(() => {
+      messageContainer.removeChild(errorMessage)
+  }, 2000) 
+}
+
+// Function to show the win message
+const showSuccessMessage = (message) => {
+  const messageContainer = document.getElementById('messageContainer')
+  const successMessage = document.createElement('div')
+
+  successMessage.textContent = message
+  successMessage.classList.add('success')
+  messageContainer.appendChild(successMessage)
+}
+
+// Function to show the updated move count
+const updateMoveCount = () => {
+  const moveCountEl = document.getElementById('move-count')
+  moveCountEl.textContent = `Moves: ${moves}`
+}
+
+// Audio for the game
+
+const playStonePlacedSound = () => {
+  const stonePlaced = document.getElementById('stonePlacedSound')
+  stonePlaced.play()
+}
+
+const playIllegalMoveSound = () => {
+  const illegalMove = document.getElementById('illegalMoveSound')
+  illegalMove.play()
+}
+
+const gameWonSound = () => {
+  const gameWon = document.getElementById('winSound')
+  gameWon.play()
+}
 
